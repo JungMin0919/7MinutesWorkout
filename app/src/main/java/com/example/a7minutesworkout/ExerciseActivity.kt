@@ -1,6 +1,8 @@
 package com.example.a7minutesworkout
 
 import android.content.Intent
+import android.media.MediaPlayer
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -24,6 +26,8 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private var currentExercisePosition = -1
 
     private var tts: TextToSpeech? = null
+
+    private var player: MediaPlayer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +54,16 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     // 휴식 뷰 셋
     private fun setupRestView(){
+        //
+        try{
+            //val soundURI = Uri.parse("android.resource://com.example.a7minutesworkout/" + R.raw.press_start)
+            player = MediaPlayer.create(applicationContext, R.raw.press_start)
+            player?.isLooping = false
+            player?.start()
+        }catch (e:java.lang.Exception){
+            e.printStackTrace()
+        }
+
         // 휴식 프로그래스바, 제목, 다음 운동 표시를 보이게하고 나머지 숨김
         binding?.flRestView?.visibility = View.VISIBLE
         binding?.tvTitle?.visibility = View.VISIBLE
@@ -167,6 +181,10 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         if(tts != null){
             tts!!.stop()
             tts!!.shutdown()
+        }
+        // player 값 삭제
+        if(player != null){
+            player!!.stop()
         }
         // 뷰 바인딩 값 삭제
         binding = null
