@@ -40,12 +40,11 @@ class ExerciseActivity : AppCompatActivity() {
 
     // 휴식 뷰 셋
     private fun setupRestView(){
-
-
-
-        // 휴식 프로그래스바, 제목을 보이게하고 나머지 숨김
+        // 휴식 프로그래스바, 제목, 다음 운동 표시를 보이게하고 나머지 숨김
         binding?.flRestView?.visibility = View.VISIBLE
         binding?.tvTitle?.visibility = View.VISIBLE
+        binding?.tvUpComingExerciseName?.visibility = View.VISIBLE
+        binding?.tvUpcomingLabel?.visibility = View.VISIBLE
         binding?.tvExerciseName?.visibility = View.INVISIBLE
         binding?.flExerciseView?.visibility = View.INVISIBLE
         binding?.ivImage?.visibility = View.INVISIBLE
@@ -54,13 +53,19 @@ class ExerciseActivity : AppCompatActivity() {
             restTimer?.cancel()
             restProgress = 0
         }
+
+        // 다음 운동 보여주기
+        binding?.tvUpComingExerciseName?.text = exerciseList!![currentExercisePosition+1].name
+
         setRestProgressBar()
     }
     // 운동 뷰 셋
     private fun setUpExerciseView(){
-        // 휴식 타이머 숨김
+        // 휴식 타이머, 다음 운동 표시 숨김
         binding?.flRestView?.visibility = View.INVISIBLE
         binding?.tvTitle?.visibility = View.INVISIBLE
+        binding?.tvUpComingExerciseName?.visibility = View.INVISIBLE
+        binding?.tvUpcomingLabel?.visibility = View.INVISIBLE
 
         // 운동 타이머, 운동 이미지 보이게
         binding?.tvExerciseName?.visibility = View.VISIBLE
