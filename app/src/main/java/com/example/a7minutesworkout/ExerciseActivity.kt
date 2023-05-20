@@ -3,11 +3,15 @@ package com.example.a7minutesworkout
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.speech.tts.TextToSpeech
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.example.a7minutesworkout.databinding.ActivityExerciseBinding
+import java.util.*
+import kotlin.collections.ArrayList
 
-class ExerciseActivity : AppCompatActivity() {
+class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private var binding : ActivityExerciseBinding? = null
     private var restTimer: CountDownTimer? = null
     private var restProgress: Long = 0
@@ -17,6 +21,8 @@ class ExerciseActivity : AppCompatActivity() {
 
     private var exerciseList : ArrayList<ExerciseModel>? = null
     private var currentExercisePosition = -1
+
+    private var tts: TextToSpeech? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +36,9 @@ class ExerciseActivity : AppCompatActivity() {
         }
 
         exerciseList = Constants.defaultExerciseList()
+
+        // tts 초기화
+        tts = TextToSpeech(this, this)
 
         binding?.toolbarExercise?.setNavigationOnClickListener{
             onBackPressedDispatcher.onBackPressed()
@@ -85,6 +94,9 @@ class ExerciseActivity : AppCompatActivity() {
             exerciseProgress = 0
         }
 
+        // 운동 이름 tts로 읽기
+        speakOut(exerciseModel.name)
+
         // 운동 프로그래스바 시작
         setExerciseProgressBar()
     }
@@ -131,6 +143,11 @@ class ExerciseActivity : AppCompatActivity() {
         }.start()
     }
 
+    // tts 실행
+    private fun speakOut(text: String){
+        tts!!.speak(text, TextToSpeech.QUEUE_FLUSH, null, "")
+    }
+
     // 액티비티 사라질때 함수
     override fun onDestroy() {
         super.onDestroy()
@@ -145,7 +162,27 @@ class ExerciseActivity : AppCompatActivity() {
             exerciseTimer?.cancel()
             exerciseProgress = 0
         }
+        // tts 값 삭제
+        if(tts != null){
+            tts!!.stop()
+            tts!!.shutdown()
+        }
         // 뷰 바인딩 값 삭제
         binding = null
+    }
+
+    // tts 성공여부 확인
+    override fun onInit(status: Int) {
+        if (status == TextToSpeech.SUCCESS) {
+            // set US English as language for tts
+            val result = tts!!.setLanguage(Locale.KOREA)
+
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e("TTS", "The Language specified is not supported!")
+            }
+
+        } else {
+            Log.e("TTS", "Initialization Failed!")
+        }
     }
 }
