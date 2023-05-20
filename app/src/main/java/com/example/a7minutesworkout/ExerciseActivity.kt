@@ -1,5 +1,6 @@
 package com.example.a7minutesworkout
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -173,16 +174,20 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     // tts 성공여부 확인
     override fun onInit(status: Int) {
-        if (status == TextToSpeech.SUCCESS) {
-            // set US English as language for tts
-            val result = tts!!.setLanguage(Locale.KOREA)
+        if (packageManager.queryIntentServices(Intent(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA), 0).isNotEmpty()) {
+            if (status == TextToSpeech.SUCCESS) {
+                // set US English as language for tts
+                val result = tts!!.setLanguage(Locale.US)
 
-            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                Log.e("TTS", "The Language specified is not supported!")
+                if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                    Log.e("TTS", "The Language specified is not supported!")
+                }
+
+            } else {
+                Log.e("TTS", "Initialization Failed!")
             }
-
-        } else {
-            Log.e("TTS", "Initialization Failed!")
+        }else{
+            Log.e("TTS", "TTS 기능을 제공하지 않는 기기 입니다.")
         }
     }
 }
