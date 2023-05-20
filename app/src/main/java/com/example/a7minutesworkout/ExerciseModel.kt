@@ -1,13 +1,11 @@
 package com.example.a7minutesworkout
 
-class ExerciseModel(
-    private var id : Int,
-            private var name : String,
-            private var image : Int,
-            private var isCompleted : Boolean,
-            private var isSelected : Boolean,
+data class ExerciseModel(
+     val id : Int,
+     val name : String,
+     val image : Int,
+     var isCompleted : Boolean,
+     var isSelected : Boolean,
 )
-{
 
 
-}

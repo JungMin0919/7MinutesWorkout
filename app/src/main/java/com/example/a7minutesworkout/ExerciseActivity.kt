@@ -38,24 +38,57 @@ class ExerciseActivity : AppCompatActivity() {
         setupRestView()
     }
 
+    // 휴식 뷰 셋
     private fun setupRestView(){
+
+
+
+        // 휴식 프로그래스바, 제목을 보이게하고 나머지 숨김
+        binding?.flRestView?.visibility = View.VISIBLE
+        binding?.tvTitle?.visibility = View.VISIBLE
+        binding?.tvExerciseName?.visibility = View.INVISIBLE
+        binding?.flExerciseView?.visibility = View.INVISIBLE
+        binding?.ivImage?.visibility = View.INVISIBLE
+
         if(restTimer != null){
             restTimer?.cancel()
             restProgress = 0
         }
         setRestProgressBar()
     }
+    // 운동 뷰 셋
     private fun setUpExerciseView(){
-        binding?.flProgressBar?.visibility = View.INVISIBLE
-        binding?.tvTitle?.text = "Exercise Name"
+        // 휴식 타이머 숨김
+        binding?.flRestView?.visibility = View.INVISIBLE
+        binding?.tvTitle?.visibility = View.INVISIBLE
+
+        // 운동 타이머, 운동 이미지 보이게
+        binding?.tvExerciseName?.visibility = View.VISIBLE
+        binding?.ivImage?.visibility = View.VISIBLE
         binding?.flExerciseView?.visibility = View.VISIBLE
+
+        // 현재 운동 모델
+        val exerciseModel = exerciseList!![currentExercisePosition]
+
+        // 운동 이미지, 제목 표시
+        binding?.ivImage?.setImageResource(exerciseModel.image)
+        binding?.tvExerciseName?.text = exerciseModel.name
+
+        // 운동 프로그래스 시작전 초기화
+        if(exerciseTimer != null){
+            exerciseTimer?.cancel()
+            exerciseProgress = 0
+        }
+
+        // 운동 프로그래스바 시작
         setExerciseProgressBar()
     }
 
+    // 휴식 프로그래스 시작
     private fun setRestProgressBar(){
         binding?.progressBar?.progress = restProgress.toInt()
 
-        restTimer = object : CountDownTimer(10000, 1000){
+        restTimer = object : CountDownTimer(1000, 1000){
             override fun onTick(p0: Long) {
                 restProgress++
                 binding?.progressBar?.progress = 10 - restProgress.toInt()
@@ -70,10 +103,11 @@ class ExerciseActivity : AppCompatActivity() {
         }.start()
     }
 
+    // 운동 프로그래스 시작
     private fun setExerciseProgressBar(){
         binding?.progressBarExercise?.progress = exerciseProgress.toInt()
 
-        exerciseTimer = object : CountDownTimer(30000, 1000){
+        exerciseTimer = object : CountDownTimer(3000, 1000){
             override fun onTick(p0: Long) {
                 exerciseProgress++
                 binding?.progressBarExercise?.progress = 30 - exerciseProgress.toInt()
@@ -81,24 +115,32 @@ class ExerciseActivity : AppCompatActivity() {
             }
 
             override fun onFinish() {
-                Toast.makeText(this@ExerciseActivity,
-                    "30 Seconds are over, lets go to the rest view", Toast.LENGTH_SHORT).show()
+                if(currentExercisePosition < exerciseList?.size!! - 1){
+                    setupRestView()
+                }else{
+                    Toast.makeText(this@ExerciseActivity, "Congratulations! You have completed the 7 minutes workout.",
+                    Toast.LENGTH_SHORT)
+                }
             }
 
         }.start()
     }
 
+    // 액티비티 사라질때 함수
     override fun onDestroy() {
         super.onDestroy()
 
+        // 휴식 프로그래스 값 삭제
         if(restTimer != null){
             restTimer?.cancel()
             restProgress = 0
         }
+        // 운동 프로그래스 값 삭제
         if(exerciseTimer != null){
             exerciseTimer?.cancel()
             exerciseProgress = 0
         }
+        // 뷰 바인딩 값 삭제
         binding = null
     }
 }
