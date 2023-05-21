@@ -1,5 +1,6 @@
 package com.example.a7minutesworkout
 
+import android.app.Dialog
 import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
@@ -13,6 +14,7 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.a7minutesworkout.databinding.ActivityExerciseBinding
+import com.example.a7minutesworkout.databinding.DialogCustomBackConfirmationBinding
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -45,18 +47,42 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         if(supportActionBar != null){
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
         }
+        binding?.toolbarExercise?.setNavigationOnClickListener{
+            customDialogForBackButton()
+        }
+
 
         exerciseList = Constants.defaultExerciseList()
 
         // tts 초기화
         tts = TextToSpeech(this, this)
 
-        binding?.toolbarExercise?.setNavigationOnClickListener{
-            onBackPressedDispatcher.onBackPressed()
-        }
-
         setupRestView()
         setupExerciseStatusRecyclerView()
+    }
+
+    override fun onBackPressed() {
+        customDialogForBackButton()
+
+        //super.onBackPressed()
+    }
+    // 뒤로가기 다이얼로그
+    private fun customDialogForBackButton(){
+        val customDialog = Dialog(this)
+        val dialogBinding = DialogCustomBackConfirmationBinding.inflate(layoutInflater)
+
+        customDialog.setContentView(dialogBinding.root)
+        customDialog.setCanceledOnTouchOutside(false)
+
+        dialogBinding.btnYes.setOnClickListener {
+            this@ExerciseActivity.finish()
+            customDialog.dismiss()
+        }
+        dialogBinding.btnNo.setOnClickListener {
+            customDialog.dismiss()
+        }
+
+        customDialog.show()
     }
 
     // 운동화면에서 운동번호 알려주기
@@ -164,7 +190,6 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             }
 
             override fun onFinish() {
-
 
                 if(currentExercisePosition < exerciseList?.size!! - 1){
                     exerciseList!![currentExercisePosition].isCompleted = true
